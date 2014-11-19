@@ -17,7 +17,7 @@ if( !class_exists( 'Skip_Activation_Email_NSD' ) ) {
             add_filter( 'wpmu_signup_user_notification', '__return_false', 1 ); // Disable confirmation email
             
             /* Add filter to remove sending activation email link when site administrators add new users to their sites */
-            add_filter( 'wpmu_signup_user', array( $this, 'wpmu_signup_user_and_skip_activation_email', 1 ) );
+            add_filter( 'wpmu_signup_user', array( $this, 'wpmu_signup_user_and_skip_activation_email' ), 10, 3 );
         }
         public function wpmu_signup_user_and_skip_activation_email( $user, $user_email, $meta = array() ) {
             global $wpdb;
@@ -40,6 +40,8 @@ if( !class_exists( 'Skip_Activation_Email_NSD' ) ) {
             ) );
             
             wpmu_activate_signup( $key );
+            $destination = network_home_url();
+            wp_redirect( $destination );
         }
     }
 }
