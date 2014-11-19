@@ -15,30 +15,15 @@ if( !class_exists( 'Skip_Activation_Email_NSD' ) ) {
         /* Construct the plugin object  */
         public function __construct() {
             /* Add filter to remove sending activation email link when site administrators add new users to their sites */
-            add_filter( 'wpmu_signup_user', array( $this, 'wpmu_signup_user_and_skip_activation_email', 1 ) );
+            add_filter( 'wpmu_signup_user_notification', '__return_false', 1 ); // Disable confirmation email
+
+            add_action( 'user_new_form', array( $this , 'custom_fields_below_add_new_user' ) );
         }
-        public function wpmu_signup_user_and_skip_activation_email( $user_name, $password, $email ) {
-            $user_name = preg_replace( '/\s+/', '', sanitize_user( $user_name, true ) );
+        public function custom_fields_below_add_new_user() {
+            echo '<p>Test Field</p>';
 
-            $user_id = wp_create_user( $user_name, $password, $email );
-            if ( is_wp_error( $user_id ) )
-                return false;
-
-            // Newly created users have no roles or caps until they are added to a blog.
-            delete_user_option( $user_id, 'capabilities' );
-            delete_user_option( $user_id, 'user_level' );
-
-            /**
-             * Fires immediately after a new user is created.
-             *
-             * @since MU
-             *
-             * @param int $user_id User ID.
-             */
-            do_action( 'wpmu_new_user', $user_id );
-
-            return $user_id;
-        }
+            echo '<label for="noconfirmation"><input type="checkbox" name="noconfirmation" id="noconfirmation" value="1" /> Add the user without sending an email that requires their confirmation.</label>';
+        }        
     }
 }
 
